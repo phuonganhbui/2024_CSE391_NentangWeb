@@ -1,0 +1,38 @@
+
+    h1
+    {
+        color: rgb(129, 23, 23);
+        border: 0px solid rgb(129, 23, 23) ;
+        border-left: 5px solid rgb(129, 23, 23);
+        
+    }
+    .box
+    {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    .box2
+    {
+        margin-top: 50px;
+    }
+    h3
+    {
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    }
+    
+    p
+    {
+        font-family:'Times New Roman', Times, serif;
+    }
+    /* .box 
+    {
+        right: 10px;
+        left: 30px;
+        width: 100px;
+        padding: 10px
+    } */
+    /* .para
+    {
+        
+    } */
