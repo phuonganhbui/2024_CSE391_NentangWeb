@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ứng dụng quản lý sinh viên</title>
+    <style>
+        /* CSS cơ bản cho giao diện */
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        input[type=text], input[type=date] { width: 100%; padding: 8px; margin-bottom: 10px; }
+        button { padding: 8px 16px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        .error { color: red; margin-top: -10px; margin-bottom: 10px; display: block; }
+    </style>
+</head>
+<body>
+
+<h2>Thêm sinh viên</h2>
+<form id="formSinhVien">
+    Họ tên: <input type="text" id="hoTen"><span class="error error-name"></span><br>
+    Mã SV: <input type="text" id="maSV"><span class="error error-code"></span><br>
+    Ngày sinh: <input type="date" id="ngaySinh"><span class="error error-date"></span><br>
+    Lớp: <input type="text" id="lop"><span class="error error-class"></span><br>
+    <button type="submit">Thêm</button>
+</form>
+
+<h2>Danh sách sinh viên</h2>
+<table id="bangSinhVien">
+    <tr>
+        <th>Họ tên</th>
+        <th>Mã SV</th>
+        <th>Ngày sinh</th>
+        <th>Lớp</th>
+        <th>Hành động</th>
+    </tr>
+</table>
+
+<script>
+    document.getElementById("formSinhVien").addEventListener("submit", function(event) {
+        event.preventDefault(); // Ngăn chặn form submit mặc định
+
+        // Xóa thông báo lỗi cũ
+        document.querySelector('.error-name').innerText = '';
+        document.querySelector('.error-code').innerText = '';
+        document.querySelector('.error-date').innerText = '';
+        document.querySelector('.error-class').innerText = '';
+
+        // Lấy dữ liệu từ form
+        const hoTen = document.getElementById("hoTen").value;
+        const maSV = document.getElementById("maSV").value;
+        const ngaySinh = document.getElementById("ngaySinh").value;
+        const lop = document.getElementById("lop").value;
+
+        // Validate dữ liệu
+        let valid = true;
+        if (hoTen === '') {
+            document.querySelector('.error-name').innerText = 'Họ tên không được để trống';
+            valid = false;
+        }
+        if (maSV === '') {
+            document.querySelector('.error-code').innerText = 'Bạn phải nhập mã sinh viên';
+            valid = false;
+        }
+        if (ngaySinh === '') {
+            document.querySelector('.error-date').innerText = 'Bạn phải nhập ngày sinh';
+            valid = false;
+        }
+        if (lop === '') {
+            document.querySelector('.error-class').innerText = 'Bạn phải nhập lớp';
+            valid = false;
+        }
+
+        if (!valid) {
+            return;
+        }
+
+        // Tạo đối tượng sinh viên mới
+        const sinhVien = {
+            hoTen,
+            maSV,
+            ngaySinh,
+            lop
+        };
+
+        // Lấy danh sách sinh viên từ localStorage hoặc tạo mảng mới nếu chưa có
+        let danhSachSinhVien = JSON.parse(localStorage.getItem("danhSachSinhVien")) || [];
+
+        // Thêm sinh viên mới vào danh sách
+        danhSachSinhVien.push(sinhVien);
+
+        // Lưu lại danh sách vào localStorage
+        localStorage.setItem("danhSachSinhVien", JSON.stringify(danhSachSinhVien));
+
+        // Hiển thị lại danh sách sinh viên
+        hienThiDanhSachSinhVien();
+
+        // Xóa dữ liệu trong form
+        document.getElementById("formSinhVien").reset();
+    });
+
+    // Hàm hiển thị danh sách sinh viên từ localStorage khi trang tải
+    function hienThiDanhSachSinhVien() {
+        const danhSachSinhVien = JSON.parse(localStorage.getItem("danhSachSinhVien")) || [];
+
+        // Lấy bảng sinh viên
+        const bangSinhVien = document.getElementById("bangSinhVien");
+
+        // Xóa các hàng cũ trong bảng (trừ hàng tiêu đề)
+        bangSinhVien.innerHTML = `
+            <tr>
+                <th>Họ tên</th>
+                <th>Mã SV</th>
+                <th>Ngày sinh</th>
+                <th>Lớp</th>
+                <th>Hành động</th>
+            </tr>
+        `;
+
+        // Thêm các hàng mới vào bảng
+        danhSachSinhVien.forEach((sinhVien, index) => {
+            const row = bangSinhVien.insertRow();
+            row.insertCell(0).innerText = sinhVien.hoTen;
+            row.insertCell(1).innerText = sinhVien.maSV;
+            row.insertCell(2).innerText = sinhVien.ngaySinh;
+            row.insertCell(3).innerText = sinhVien.lop;
+            const actions = row.insertCell(4);
+            const deleteButton = document.createElement("button");
+            deleteButton.innerText = "Xóa";
+            deleteButton.onclick = function() {
+                xoaSinhVien(index);
+            };
+            actions.appendChild(deleteButton);
+        });
+    }
+
+    // Hàm xóa sinh viên
+    function xoaSinhVien(index) {
+        // Lấy danh sách sinh viên từ localStorage
+        let danhSachSinhVien = JSON.parse(localStorage.getItem("danhSachSinhVien")) || [];
+
+        // Xóa sinh viên theo chỉ số
+        danhSachSinhVien.splice(index, 1);
+
+        // Lưu lại danh sách vào localStorage
+        localStorage.setItem("danhSachSinhVien", JSON.stringify(danhSachSinhVien));
+
+        // Hiển thị lại danh sách sinh viên
+        hienThiDanhSachSinhVien();
+    }
+
+    // Gọi hàm hiển thị danh sách khi trang tải
+    hienThiDanhSachSinhVien();
+</script>
+
+</body>
+</html>
